@@ -1,0 +1,641 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Volleyball-Rotationen 5-1 mit Libero</title>
+
+  <style>
+    :root {
+      --blue:#0877d1;
+      --paper:#fffdf6;
+      --ink:#17202a;
+    }
+
+    * {
+      box-sizing:border-box;
+    }
+
+    body {
+      margin:0;
+      background:#e9dfc5;
+      color:var(--ink);
+      font-family:Arial,sans-serif;
+    }
+
+    header {
+      position:sticky;
+      top:0;
+      z-index:20;
+      padding:12px;
+      background:rgba(255,253,246,.97);
+      box-shadow:0 2px 12px #0002;
+    }
+
+    h1 {
+      margin:0 0 10px;
+      text-align:center;
+      font-size:clamp(20px,4vw,30px);
+    }
+
+    .editor {
+      max-width:980px;
+      margin:auto;
+      display:grid;
+      grid-template-columns:repeat(6,minmax(80px,1fr));
+      gap:8px;
+    }
+
+    label {
+      font-weight:700;
+      font-size:13px;
+    }
+
+    input {
+      width:100%;
+      margin-top:3px;
+      padding:9px 7px;
+      border:1px solid #9ca3af;
+      border-radius:8px;
+      font-size:16px;
+    }
+
+    .actions {
+      max-width:980px;
+      margin:9px auto 0;
+      display:flex;
+      justify-content:center;
+      gap:8px;
+    }
+
+    button {
+      border:0;
+      border-radius:8px;
+      padding:9px 15px;
+      background:#096fc1;
+      color:#fff;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    button.secondary {
+      background:#68727d;
+    }
+
+    main {
+      width:min(700px,100%);
+      margin:auto;
+      padding:18px 12px 50px;
+    }
+
+    .rotation {
+      margin:0 0 22px;
+      padding:14px;
+      border-radius:14px;
+      background:var(--paper);
+      box-shadow:0 3px 14px #0002;
+      break-inside:avoid;
+    }
+
+    h2 {
+      margin:0 0 10px;
+      text-align:center;
+      font-size:22px;
+    }
+
+    /* Aufstellung and Annahme one below the other */
+    .pair {
+      display:grid;
+      grid-template-columns:1fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .diagram-title {
+      margin-bottom:5px;
+      text-align:center;
+      font-size:16px;
+      font-weight:700;
+      color:#53606d;
+    }
+
+    .court {
+      position:relative;
+      width:100%;
+      aspect-ratio:1;
+      border:clamp(2px,.55vw,5px) solid var(--blue);
+      background:#f8edcf;
+      overflow:hidden;
+    }
+
+    .court::before {
+      content:"";
+      position:absolute;
+      z-index:1;
+      top:33.333%;
+      left:0;
+      width:100%;
+      height:clamp(2px,.38vw,4px);
+      background:var(--blue);
+      transform:translateY(-50%);
+    }
+
+    .court.start::before {
+      top:50%;
+    }
+
+    .court.start::after {
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:1;
+      background:
+        linear-gradient(
+          to right,
+          transparent 33.1%,
+          #0877d177 33.1% 33.6%,
+          transparent 33.6% 66.4%,
+          #0877d177 66.4% 66.9%,
+          transparent 66.9%
+        );
+    }
+
+    .player {
+      position:absolute;
+      z-index:3;
+      left:var(--x);
+      top:var(--y);
+      width:60px;
+      aspect-ratio:1;
+      transform:translate(-50%,-50%);
+      border-radius:50%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      line-height:1.02;
+      border:2px solid #0002;
+      box-shadow:0 2px 5px #0003;
+      text-align:center;
+      color:#071018;
+    }
+
+    .role {
+      font-weight:900;
+      font-size:18px;
+    }
+
+    .name {
+      max-width:92%;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      font-weight:700;
+      font-size:14px;
+    }
+
+    .mb {
+      background:#00e5e5;
+    }
+
+    .libero {
+      background:#ffffff;
+      border:2px solid #52525b;
+    }
+
+    .note {
+      text-align:center;
+      font-size:13px;
+      margin:0 0 12px;
+      color:#53606d;
+    }
+
+    .aa {
+      background:#ff3131;
+    }
+
+    .z {
+      background:#fff200;
+    }
+
+    .d {
+      background:#c084fc;
+    }
+
+    .legend {
+      margin-top:8px;
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:center;
+      gap:6px 14px;
+      font-size:12px;
+      color:#53606d;
+    }
+
+    @media (max-width:650px) {
+
+      header {
+        position:relative;
+      }
+
+      .editor {
+        grid-template-columns:repeat(2,1fr);
+      }
+
+      main {
+        padding:12px 6px 30px;
+      }
+
+      .rotation {
+        padding:9px 6px;
+      }
+
+      .pair {
+        grid-template-columns:1fr;
+        gap:14px;
+      }
+
+      .player {
+        width:46px;
+        border-width:1px;
+      }
+
+      .role {
+        font-size:13px;
+      }
+
+      .name {
+        font-size:11px;
+      }
+    }
+
+    @media print {
+
+      body {
+        background:#fff;
+      }
+
+      header {
+        position:static;
+        box-shadow:none;
+      }
+
+      .actions {
+        display:none;
+      }
+
+      main {
+        width:100%;
+        padding:0;
+      }
+
+      .rotation {
+        box-shadow:none;
+        page-break-after:always;
+        margin:0;
+        padding:8mm;
+      }
+
+      .rotation:last-child {
+        page-break-after:auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+
+  <h1>Volleyball-Rotationen 5-1 mit Libero</h1>
+
+  <div class="editor" id="editor"></div>
+
+  <div class="actions">
+    <button onclick="window.print()">Drucken / PDF</button>
+    <button class="secondary" id="clear">Namen löschen</button>
+  </div>
+
+</header>
+
+
+<main id="rotations"></main>
+
+
+<script>
+
+  const roles = ['D','MB1','MB2','AA1','AA2','Z','L'];
+
+  const colors = {
+    D:'d',
+    MB1:'mb',
+    MB2:'mb',
+    L:'libero',
+    AA1:'aa',
+    AA2:'aa',
+    Z:'z'
+  };
+
+
+  const starts = [
+
+    ['D','MB2','AA1','AA2','MB1','Z'],
+
+    ['MB2','AA1','Z','D','AA2','MB1'],
+
+    ['AA1','Z','MB1','MB2','D','AA2'],
+
+    ['Z','MB1','AA2','AA1','MB2','D'],
+
+    ['MB1','AA2','D','Z','AA1','MB2'],
+
+    ['AA2','D','MB2','MB1','Z','AA1']
+
+  ];
+
+
+  const finishes = [
+
+    {
+      D:[6.3,41],
+      MB2:[18.3,31],
+      AA1:[81.7,54.3],
+      AA2:[18.3,67.7],
+      MB1:[50,71],
+      Z:[91.7,64.3]
+    },
+
+    {
+      MB2:[10,34],
+      AA1:[20,60.7],
+      AA2:[53.3,64],
+      MB1:[80,60.7],
+      Z:[70,17.3],
+      D:[46.7,77.3]
+    },
+
+    {
+      AA1:[11.7,51.7],
+      MB2:[44.3,58.3],
+      AA2:[74.3,58.3],
+      MB1:[87.7,25],
+      Z:[74.3,8.3],
+      D:[57.7,71.7]
+    },
+
+    {
+      Z:[12.3,21.3],
+      MB1:[17.3,34.7],
+      AA2:[22.3,58],
+      AA1:[50,61.3],
+      MB2:[75,61.3],
+      D:[81.7,71.3]
+    },
+
+    {
+      MB1:[11.8,25.7],
+      Z:[21.8,32.3],
+      AA2:[21.8,59],
+      AA1:[45.5,65.7],
+      MB2:[72.2,62.3],
+      D:[92.2,52.3]
+    },
+
+    {
+      AA2:[24.8,67.8],
+      MB1:[52.5,67.8],
+      AA1:[87.5,64.5],
+      Z:[74.2,23.8],
+      MB2:[90.8,37.2],
+      D:[87.5,13.8]
+    }
+
+  ];
+
+
+  // starts: indices 0-2 = front row (4,3,2); indices 3-5 = back row (5,6,1).
+  // Under FIVB rules, MB serves from position 1; libero plays back-row 5 and 6.
+  const backRowPositions = new Set([3,4]);
+
+  function liberoForRotation(order) {
+    const replaced = order.find((role,index) => role.startsWith('MB') && backRowPositions.has(index));
+    const servingMB = order[5]?.startsWith('MB') ? order[5] : null;
+    return { replaced, servingMB };
+  }
+
+  function substitutions(order) {
+    const {replaced} = liberoForRotation(order);
+    return role => role === replaced ? 'L' : role;
+  }
+
+  const saved =
+    JSON.parse(localStorage.getItem('volleyballLiberoNames') || '{}');
+
+
+  const editor = document.getElementById('editor');
+
+
+  roles.forEach(role => {
+
+    const label = document.createElement('label');
+
+    label.textContent = role;
+
+
+    const input = document.createElement('input');
+
+    input.dataset.role = role;
+
+    input.value = saved[role] || '';
+
+    input.placeholder = 'Name';
+
+
+    input.addEventListener('input', () => {
+
+      saved[role] = input.value;
+
+      localStorage.setItem(
+        'volleyballLiberoNames',
+        JSON.stringify(saved)
+      );
+
+      updateNames();
+
+    });
+
+
+    label.append(input);
+
+    editor.append(label);
+
+  });
+
+
+  function player(role,x,y) {
+
+    return `
+      <div
+        class="player ${colors[role]}"
+        style="--x:${x}%;--y:${y}%"
+      >
+        <span class="role">${role}</span>
+        <span class="name" data-name="${role}"></span>
+      </div>
+    `;
+
+  }
+
+
+  function startCourt(order) {
+
+    const spots = [
+
+      [16.67,25],
+      [50,25],
+      [83.33,25],
+
+      [16.67,75],
+      [50,75],
+      [83.33,75]
+
+    ];
+
+
+    return `
+      <div>
+
+        <div class="diagram-title">
+          Aufstellung
+        </div>
+
+        <div class="court start">
+
+          ${
+            order
+              .map((r,i) => player(substitutions(order)(r),...spots[i]))
+              .join('')
+          }
+
+        </div>
+
+      </div>
+    `;
+
+  }
+
+
+  function finishCourt(pos,order) {
+
+    return `
+      <div>
+
+        <div class="diagram-title">
+          Annahme
+        </div>
+
+        <div class="court">
+
+          ${
+            Object.entries(pos)
+              .map(([r,p]) => player(substitutions(order)(r),...p))
+              .join('')
+          }
+
+        </div>
+
+      </div>
+    `;
+
+  }
+
+
+  const displayOrder = [1,0,5,4,3,2];
+
+
+  document.getElementById('rotations').innerHTML =
+
+    displayOrder.map(i => `
+
+      <section class="rotation">
+
+        <h2>
+          Läufer ${i+1}
+        </h2>
+
+        <p class="note">${liberoForRotation(starts[i]).replaced ? `Libero ersetzt ${liberoForRotation(starts[i]).replaced} auf der Hinterreihe.` : liberoForRotation(starts[i]).servingMB ? `${liberoForRotation(starts[i]).servingMB} schlägt auf (Position 1); Libero darf erst nach dem Aufschlag für den Mittelblocker eintreten.` : 'Keine Libero-Auswechslung in dieser Aufstellung.'}</p>
+
+        <div class="pair">
+
+          ${startCourt(starts[i])}
+
+          ${finishCourt(finishes[i],starts[i])}
+
+        </div>
+
+        <div class="legend">
+
+          <span>
+            <b>Z</b> - Zuspieler
+          </span>
+
+          <span>
+            <b>D</b> - Diagonalangreifer
+          </span>
+
+          <span>
+            <b>AA</b> - Außenangreifer
+          </span>
+
+          <span>
+            <b>MB</b> - Mittelblocker
+          </span>
+
+          <span>
+            <b>L</b> - Libero
+          </span>
+
+        </div>
+
+      </section>
+
+    `).join('');
+
+
+  function updateNames() {
+
+    document
+      .querySelectorAll('[data-name]')
+      .forEach(el => {
+
+        el.textContent =
+          saved[el.dataset.name] || '';
+
+      });
+
+  }
+
+
+  document
+    .getElementById('clear')
+    .addEventListener('click', () => {
+
+      roles.forEach(r => saved[r] = '');
+
+      localStorage.removeItem('volleyballNames');
+
+      document
+        .querySelectorAll('input')
+        .forEach(i => i.value = '');
+
+      updateNames();
+
+    });
+
+
+  updateNames();
+
+</script>
+
+</body>
+</html>
