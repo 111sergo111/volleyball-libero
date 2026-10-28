@@ -423,9 +423,11 @@
     return { replaced, servingMB };
   }
 
-  function substitutions(order) {
-    const {replaced} = liberoForRotation(order);
-    return role => role === replaced ? 'L' : role;
+  function substitutions(order, receiving = false) {
+    const {replaced, servingMB} = liberoForRotation(order);
+    // In Aufstellung the MB at position 1 serves; in Annahme the libero receives instead.
+    const target = replaced || (receiving ? servingMB : null);
+    return role => role === target ? 'L' : role;
   }
 
   const saved =
@@ -538,7 +540,7 @@
 
           ${
             Object.entries(pos)
-              .map(([r,p]) => player(substitutions(order)(r),...p))
+              .map(([r,p]) => player(substitutions(order,true)(r),...p))
               .join('')
           }
 
@@ -563,7 +565,7 @@
           Läufer ${i+1}
         </h2>
 
-        <p class="note">${liberoForRotation(starts[i]).replaced ? `Libero ersetzt ${liberoForRotation(starts[i]).replaced} auf der Hinterreihe.` : liberoForRotation(starts[i]).servingMB ? `${liberoForRotation(starts[i]).servingMB} schlägt auf (Position 1); Libero darf erst nach Ende der Aufschlagserie des Mittelblockers bei einer Spielunterbrechung eintreten.` : 'Keine Libero-Auswechslung in dieser Aufstellung.'}</p>
+        <p class="note">${liberoForRotation(starts[i]).replaced ? `Libero ersetzt ${liberoForRotation(starts[i]).replaced} auf der Hinterreihe.` : liberoForRotation(starts[i]).servingMB ? `${liberoForRotation(starts[i]).servingMB} schlägt auf (Position 1); In der Annahme übernimmt der Libero die Hinterreihe.` : 'Keine Libero-Auswechslung in dieser Aufstellung.'}</p>
 
         <div class="pair">
 
