@@ -563,7 +563,7 @@
           Läufer ${i+1}
         </h2>
 
-        <p class="note">${liberoForRotation(starts[i]).replaced ? `Libero ersetzt ${liberoForRotation(starts[i]).replaced} auf der Hinterreihe.` : liberoForRotation(starts[i]).servingMB ? `${liberoForRotation(starts[i]).servingMB} schlägt auf (Position 1); Libero darf erst nach dem Aufschlag für den Mittelblocker eintreten.` : 'Keine Libero-Auswechslung in dieser Aufstellung.'}</p>
+        <p class="note">${liberoForRotation(starts[i]).replaced ? `Libero ersetzt ${liberoForRotation(starts[i]).replaced} auf der Hinterreihe.` : liberoForRotation(starts[i]).servingMB ? `${liberoForRotation(starts[i]).servingMB} schlägt auf (Position 1); Libero darf erst nach Ende der Aufschlagserie des Mittelblockers bei einer Spielunterbrechung eintreten.` : 'Keine Libero-Auswechslung in dieser Aufstellung.'}</p>
 
         <div class="pair">
 
@@ -622,7 +622,7 @@
 
       roles.forEach(r => saved[r] = '');
 
-      localStorage.removeItem('volleyballNames');
+      localStorage.removeItem('volleyballLiberoNames');
 
       document
         .querySelectorAll('input')
