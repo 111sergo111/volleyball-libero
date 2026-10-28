@@ -490,7 +490,7 @@
   }
 
 
-  function startCourt(order) {
+  function startCourt(order, runner) {
 
     const spots = [
 
@@ -509,7 +509,7 @@
       <div>
 
         <div class="diagram-title">
-          Aufstellung
+          Aufstellung - Läufer ${runner}
         </div>
 
         <div class="court start">
@@ -528,13 +528,13 @@
   }
 
 
-  function finishCourt(pos,order) {
+  function finishCourt(pos,order,runner) {
 
     return `
       <div>
 
         <div class="diagram-title">
-          Annahme
+          Annahme - Läufer ${runner}
         </div>
 
         <div class="court">
@@ -570,9 +570,9 @@
 
         <div class="pair">
 
-          ${startCourt(starts[i])}
+          ${startCourt(starts[i],i+1)}
 
-          ${finishCourt(finishes[i],starts[i])}
+          ${finishCourt(finishes[i],starts[i],i+1)}
 
         </div>
 
